@@ -1,6 +1,7 @@
-# Sends a test task to the Celery worker and waits for the result.
-from tasks import add
+from tasks.slurm_tasks import run_slurm_inference
 
-for i in range(5):
-    result = add.delay(i, i * 2)
-    print(f"Task {i} → result: {result.get(timeout=10)}")
+result = run_slurm_inference.delay("abc123")
+print("SLURM job submitted...")
+
+print("Waiting for result:")
+print(result.get(timeout=60))
