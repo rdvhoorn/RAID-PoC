@@ -209,3 +209,4 @@ __marimo__/
 # Redis persistence files
 dump.rdb
 appendonly.aof
+uv.lock

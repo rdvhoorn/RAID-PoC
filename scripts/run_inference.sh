@@ -8,7 +8,7 @@ WSI_ID=$1
 OUTPUT_DIR=$2
 
 echo "Starting fake AI inference on WSI: $WSI_ID"
-sleep 5
+sleep 10
 
 mkdir -p "$OUTPUT_DIR"
 

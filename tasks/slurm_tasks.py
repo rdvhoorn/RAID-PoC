@@ -7,6 +7,7 @@ import os
 from celery import Celery
 from utils.config import config
 from pathlib import Path
+import json
 
 from db.session import SessionLocal
 from db.models import Job, ResultFile, JobStatusEnum
@@ -55,23 +56,27 @@ def run_slurm_inference(wsi_id: str, tool_name: str):
     
     # Poll for output file
     for _ in range(config["MAX_POLL_ATTEMPTS"]):
-        if os.path.isfile(output_file): # Check file existance
-            print(f"Result file found: {output_file}")
-            
-            job.status = JobStatusEnum.COMPLETED
-            
-            # Log result file
-            session.add(ResultFile(
-                job_id=job_id,
-                file_path=str(output_file),
-                file_type="json",
-                description="SLURM job output"
-            ))
-            
-            session.commit()
-            session.close()
-            return {"status": "COMPLETED", "job_id": job_id}
-        
+        if os.path.isfile(output_file):
+            try:
+                with open(output_file, "r") as f:
+                    data = json.load(f)
+                    if data.get("status") == "COMPLETED":
+                        print(f"Result file complete: {output_file}")
+                        
+                        job.status = JobStatusEnum.COMPLETED
+                        session.add(ResultFile(
+                            job_id=job_id,
+                            file_path=str(output_file),
+                            file_type="json",
+                            description="SLURM job output"
+                        ))
+                        session.commit()
+                        session.close()
+                        return {"status": "COMPLETED", "job_id": job_id}
+            except json.JSONDecodeError:
+                # File may still be in the process of being written
+                pass
+
         time.sleep(config["POLL_INTERVAL_SEC"])
 
     # Timeout
