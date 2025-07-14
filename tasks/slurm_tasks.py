@@ -3,17 +3,31 @@
 
 import subprocess
 import time
+import os
 from celery import Celery
 from utils.config import config
 from pathlib import Path
+
+from db.session import SessionLocal
+from db.models import Job, ResultFile, JobStatusEnum
 
 # Reuse your main Celery app definition
 app = Celery('raid_tasks', broker='redis://localhost:6379/0', backend='redis://localhost:6379/0')
 
 @app.task
-def run_slurm_inference(wsi_id: str):
-    """Launch a SLURM job to simulate inference on a WSI."""
-    print(f"Submitting SLURM job for WSI: {wsi_id}")
+def run_slurm_inference(wsi_id: str, tool_name: str):
+    """Launch a SLURM job to simulate inference on a WSI."""    
+    # Create DB session to interact with database
+    session = SessionLocal()
+    
+    # Fetch corresponding job
+    job = session.query(Job).filter_by(wsi_id=wsi_id, tool_name=tool_name).first()
+    job_id = job.job_id
+    if not job:
+        session.close()
+        raise ValueError(f"No corresponding job found in DB for WSI {wsi_id} and tool {tool_name}.")
+    
+    print(f"Running SLURM job for existing job ID: {job_id}")
 
     # Submit SLURM job using sbatch
     result = subprocess.run(
@@ -22,24 +36,46 @@ def run_slurm_inference(wsi_id: str):
         stderr=subprocess.PIPE,
         text=True
     )
+    
+    # Update job status in database
+    job.status = JobStatusEnum.RUNNING
+    session.commit()
 
+    # Handle faulting process
     if result.returncode != 0:
         print(f"SLURM submission failed: {result.stderr}")
-        return {"status": "ERROR", "error": result.stderr}
+        job.status = JobStatusEnum.FAILED
+        session.commit()
+        session.close()
+        return {"status": "FAILED", "error": result.stderr}
 
-    # Extract SLURM job ID from output
-    stdout = result.stdout.strip()
-    print(f"SLURM submission output: {stdout}")
-    job_id = stdout.split()[-1]
-
-    # Optionally: poll for result file
+    # Format output path
     output_dir = Path(config["INFERENCE_OUTPUT_DIR"])  # from .env or config.py
     output_file = output_dir / f"{wsi_id}.json"  # matches script output
+    
+    # Poll for output file
     for _ in range(config["MAX_POLL_ATTEMPTS"]):
-        if subprocess.run(["test", "-f", output_file]).returncode == 0:
+        if os.path.isfile(output_file): # Check file existance
             print(f"Result file found: {output_file}")
-            with open(output_file) as f:
-                return f.read()
+            
+            job.status = JobStatusEnum.COMPLETED
+            
+            # Log result file
+            session.add(ResultFile(
+                job_id=job_id,
+                file_path=str(output_file),
+                file_type="json",
+                description="SLURM job output"
+            ))
+            
+            session.commit()
+            session.close()
+            return {"status": "COMPLETED", "job_id": job_id}
+        
         time.sleep(config["POLL_INTERVAL_SEC"])
 
+    # Timeout
+    job.status = JobStatusEnum.TIMEOUT
+    session.commit()
+    session.close()
     return {"status": "TIMEOUT", "job_id": job_id}
