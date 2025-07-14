@@ -1,14 +1,14 @@
-DB_DIR=$(HOME)/dbs/raid_pgdata
-DB_LOG_FILE=$(HOME)/dbs/raidpoc_pgdb_logfile
-DB_NAME=raidpoc
-CELERY_APP=tasks.slurm_tasks
-CELERY_LOGFILE=celery.log
-CELERY_PIDFILE=celery.pid
-PYTHON=python
+# Load environment variables from .env
+ifneq (,$(wildcard .env))
+	include .env
+	export
+endif
 
+# Set python path
 export PYTHONPATH := $(shell pwd)
 
 
+# Define commands
 up:
 	@echo "Starting backend: PostgreSQL + Redis + Celery"
 	@make start_db
