@@ -6,34 +6,51 @@ RAID integrates AI analysis tools directly into the Sectra-PACS workflow to supp
 These requests are sent to the separate RAID application, which handles processing asynchronously. Once complete, RAID notifies Sectra-PACS, allowing results to be displayed as overlays or in a dedicated results panel.
 
 ## 🧪 Quickstart (Local HPC Testing)
+When correctly setup, just use the make file to startup `make up` and stop `make down`. 
 
-### 1. Start Redis
+# Full setup
+Three parts
+1. Environment setup
+2. PostGreSQL database initialization
+3. Config file setup
+
+## Environment setup
+Assuming miniconda is installed
 ```bash
-redis-server &
+conda env create -f environment.yml
+conda activate RAID-PoC
+pip install uv
+uv pip install -r requirements.txt
 ```
 
-### 2. Start Celery Worker
+## Postgres setup
+Assuming the environment is activated
 ```bash
-celery -A tasks worker --loglevel=info --concurrency=1 --pool=solo --logfile=celery.log
+initdb -D <path/to/where/you/want/your/databasefolder>
 ```
 
-### 3. Run Test Task
-```bash
-python run_task.py
-```
+## .env file
+Copy paste the `example.env` file and rename to `.env`. Set the right parameters, given your install
 
-### 4. PostGreSQL stuff
+# File structure
 ```bash
-pg_ctl -D ~/dbs/raid_pgdata -l ~/dbs/raidpoc_pgdb_logfile start // DB startup
-python sqlalchemy_dbconnection_test.py // check whether db works correclty
-pg_ctl -D ~/dbs/raid_pgdata stop // stop db
-```
+raid_poc/
+├── db/
+│   ├── models.py       # DB model definition
+│   └── session.py      # DB session init
+├── tasks/
+│   └── slurm_tasks.py  # Slurm task definition for deploying inference jobs
+├── scripts/
+│   └── raid_infer.sh  # SLURM inference simulation job
+├── utils
+│   ├── clear_db.py    # Clearing all db entries
+│   ├── config.py      # Config loading file from .env (no need to edit)
+│   └── init_db.py     # DB initialization script
+├── run_task.py        # Manual test input file
+├── example.env        # Contains paths like OUTPUT_DIR
+├── Makefile           # Script definitions for easier application running
 
-### 📂 File Overview for first tests
-- tasks.py – defines Celery tasks (e.g., add)
-- run_task.py – sends test tasks to Celery
-- celery.log – Celery worker log output
-- sqlalchemy_dbconnection_test.py - tests the pg db connection using sqlalchemy
+```
 
 ### 🔧 Notes
-**Avoid** running with default concurrency (--concurrency=1 --pool=solo) to prevent session crashes due to OOM fallbacks.
+**Avoid** running with default concurrency (--concurrency=1 --pool=solo) to prevent session crashes due to OOM fallbacks on helios.

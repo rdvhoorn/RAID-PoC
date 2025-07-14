@@ -1,0 +1,7 @@
+name: RAID-PoC
+channels:
+  - defaults
+dependencies:
+  - postgresql
+  - psycopg2
+  - redis

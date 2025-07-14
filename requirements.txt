@@ -1,0 +1,6 @@
+uv==0.7.20
+celery==5.5.3
+fastapi==0.116.0
+python-dotenv==1.1.1
+redis==6.2.0
+sqlalchemy==2.0.41
