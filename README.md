@@ -6,7 +6,7 @@ RAID integrates AI analysis tools directly into the Sectra-PACS workflow to supp
 These requests are sent to the separate RAID application, which handles processing asynchronously. Once complete, RAID notifies Sectra-PACS, allowing results to be displayed as overlays or in a dedicated results panel.
 
 ## 🧪 Quickstart (Local HPC Testing)
-When correctly setup, just use the make file to startup `make up` and stop `make down`. 
+When correctly setup, just use the make file to startup (`make up`) and stop (`make down`). 
 
 # Full setup
 Three parts
