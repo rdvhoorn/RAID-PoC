@@ -18,14 +18,10 @@ jobs:
         with:
           python-version: '3.13.5'  # match your local Python
 
-      - name: Install uv
+      - name: Install dependencies
         run: |
-          pip install uv
-
-      - name: Install dependencies using uv
-        run: |
-          uv pip install -r requirements.txt
-          uv pip install pytest pytest-mock
+          pip install -r requirements.txt
+          pip install pytest pytest-mock
 
       - name: Run unit tests
         run: |
