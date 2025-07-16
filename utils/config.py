@@ -8,4 +8,5 @@ config = {
     "INFERENCE_OUTPUT_DIR": os.getenv("INFERENCE_OUTPUT_DIR", "/tmp/raid_results"),
     "POLL_INTERVAL_SEC": int(os.getenv("POLL_INTERVAL_SEC", 1)),
     "MAX_POLL_ATTEMPTS": int(os.getenv("MAX_POLL_ATTEMPTS", 30)),
+    "DEVELOPER_MODE": os.getenv("DEVELOPER_MODE", "True"),
 }
