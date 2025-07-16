@@ -9,6 +9,9 @@ export PYTHONPATH := $(shell pwd)
 
 
 # Define commands
+up:
+	@honcho start -f ./Procfile.dev
+
 init_db:
 	@echo "(Re-)Initializing database schema..."
 	@$(PYTHON) utils/init_db.py
@@ -36,7 +39,7 @@ stop_db:
 
 
 # ------ Not needed anymore (use honcho + Procfile.dev for ideal logging overview) -----
-up:
+up_old:
 	@echo "Starting backend: PostgreSQL + Redis + Celery"
 	@make start_db
 	@make init_db
