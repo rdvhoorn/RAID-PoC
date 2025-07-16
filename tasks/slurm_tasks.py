@@ -15,6 +15,7 @@ from utils.logging_config import get_and_configure_logger
 
 # Reuse your main Celery app definition
 app = Celery('raid_tasks', broker='redis://localhost:6379/0', backend='redis://localhost:6379/0')
+app.conf.worker_hijack_root_logger = False 
 
 # Get logger
 log = get_and_configure_logger()
