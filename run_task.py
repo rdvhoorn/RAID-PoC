@@ -1,8 +1,8 @@
 # Client utility that uses the FastAPI endpoints instead of directly accessing the DB/Celery
 
 import time
-from utils.tasks.submit_job import submit_job
-from utils.tasks.check_status import check_job_status
+from utils.simulate_api_call.submit_job import submit_job
+from utils.simulate_api_call.check_status import check_job_status
 from utils.config import config
 from pathlib import Path
 

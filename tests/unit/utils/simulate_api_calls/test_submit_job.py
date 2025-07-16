@@ -1,4 +1,4 @@
-from utils.tasks.submit_job import submit_job
+from utils.simulate_api_call.submit_job import submit_job
 
 def test_submit_job_success(mocker):
     # Arrange: define a fake successful response, like the API would respond
