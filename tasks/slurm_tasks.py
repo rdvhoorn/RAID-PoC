@@ -79,8 +79,8 @@ def run_slurm_inference(wsi_id: str, tool_name: str):
 
         time.sleep(config["POLL_INTERVAL_SEC"])
 
-    # Timeout
-    job.status = JobStatusEnum.TIMEOUT
+    # FAILED
+    job.status = JobStatusEnum.FAILED
     session.commit()
     session.close()
-    return {"status": "TIMEOUT", "job_id": job_id}
+    return {"status": "FAILED", "job_id": job_id}
