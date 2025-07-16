@@ -7,7 +7,7 @@ from db.models import Job, JobStatusEnum
 from tasks.slurm_tasks import run_slurm_inference
 from utils.logging_config import get_and_configure_logger
 
-_ = get_and_configure_logger("FastAPI")
+_ = get_and_configure_logger()
 app = FastAPI()
 app.add_middleware(RequestIDMiddleware)
 

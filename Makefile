@@ -56,7 +56,7 @@ down:
 
 start_celery:
 	@echo "Starting Celery worker in background"
-	@celery -A $(CELERY_APP) worker --loglevel=info --concurrency=1 --pool=solo --detach --logfile=$(CELERY_LOGFILE) --pidfile=$(CELERY_PIDFILE)
+	@SERVICE_NAME=$(CELERY_SERVICE_NAME) PYTHONPATH=. celery -A $(CELERY_APP) worker --loglevel=info --concurrency=1 --pool=solo --detach --logfile=$(CELERY_LOGFILE) --pidfile=$(CELERY_PIDFILE)
 
 stop_celery:
 	@echo "Stopping Celery worker"
@@ -68,7 +68,7 @@ stop_celery:
 
 start_fastapi:
 	@echo "Starting FastAPI server in background on http://localhost:8000"
-	@nohup uvicorn api.main:app --port 8000 --log-level info > fastapi.log 2>&1 & echo $$! > fastapi.pid
+	@SERVICE_NAME=$(FASTAPI_SERVICE_NAME) nohup uvicorn api.main:app --port 8000 --log-level info > fastapi.log 2>&1 & echo $$! > fastapi.pid
 
 stop_fastapi:
 	@echo "Stopping FastAPI server"

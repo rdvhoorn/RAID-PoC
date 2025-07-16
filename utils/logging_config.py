@@ -1,6 +1,7 @@
 import logging
 import sys
 import structlog
+import os
 from logging import Logger
 from utils.config import config
 
@@ -47,6 +48,11 @@ def configure_logging(dev_mode) -> None:
 
 
 def get_and_configure_logger(service: str = None, dev_mode=config["DEVELOPER_MODE"]) -> Logger:
+    if service is None:
+        env_service = os.getenv("SERVICE_NAME", None)
+        if env_service:
+            service = env_service
+    
     global _configured
     if not _configured:
         configure_logging(dev_mode)
