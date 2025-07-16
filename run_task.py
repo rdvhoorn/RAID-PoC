@@ -19,18 +19,22 @@ else:
 
 # Step 2: First status check (should still be running)
 time.sleep(2)
-status1 = check_job_status(wsi_id)
-if status1:
-    print("[2] First status check:", status1)
+status = check_job_status(wsi_id, tool_name)
+if status:
+    print("[2] First status check:", status)
 
-# Step 3: Second status check after simulated processing time
-time.sleep(12)
-status2 = check_job_status(wsi_id)
-if status2:
-    print("[3] Final status check:", status2)
+# Step 3: Poll for 2 minutes or until completed
+count = 0
+while status['status'] in ["PENDING", "RUNNING"] and count < 12:
+    time.sleep(10)
+    status = check_job_status(wsi_id, tool_name)
+    if status:
+        print(f"[{count}] Poll status check:", status)
+        
+    count += 1
 
 # Step 4: Cleanup result and log files
-if status2['status'] == "COMPLETED":
+if status['status'] == "COMPLETED":
     json_file = output_dir / f"{wsi_id}.json"
     slurm_log = output_dir / f"slurm_{wsi_id}.out"
 
