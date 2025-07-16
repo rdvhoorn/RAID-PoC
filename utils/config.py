@@ -9,4 +9,5 @@ config = {
     "POLL_INTERVAL_SEC": int(os.getenv("POLL_INTERVAL_SEC", 1)),
     "MAX_POLL_ATTEMPTS": int(os.getenv("MAX_POLL_ATTEMPTS", 30)),
     "DEVELOPER_MODE": os.getenv("DEVELOPER_MODE", "True"),
+    "FASTAPI_PORT": os.getenv("FASTAPI_PORT", 8000)
 }

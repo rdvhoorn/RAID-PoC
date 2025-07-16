@@ -1,0 +1,3 @@
+redis: PYTHONPATH=. redis-server --save "" --appendonly no
+fastapi: PYTHONPATH=. uvicorn api.main:app --port $FASTAPI_PORT --reload
+celery: PYTHONPATH=. celery -A $CELERY_APP worker --loglevel=info --concurrency=1 --pool=solo

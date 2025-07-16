@@ -2,7 +2,7 @@ import logging
 import sys
 import structlog
 from logging import Logger
-import config
+from utils.config import config
 
 _configured = False
 

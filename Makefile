@@ -9,6 +9,33 @@ export PYTHONPATH := $(shell pwd)
 
 
 # Define commands
+init_db:
+	@echo "(Re-)Initializing database schema..."
+	@$(PYTHON) utils/init_db.py
+
+clear_db:
+	@echo "Deleting all data (preserving schema)"
+	@$(PYTHON) utils/clear_db.py
+
+start_db:
+	@echo "Starting PostgreSQL"
+	@pg_ctl -D $(DB_DIR) -l $(DB_LOG_FILE) start
+
+start_init_db:
+	@make start_db
+	@make init_db
+
+stop_db:
+	@echo "Stopping PostgreSQL server"
+	@if pg_ctl -D $(DB_DIR) status > /dev/null 2>&1; then \
+		pg_ctl -D $(DB_DIR) stop -m fast && echo "PostgreSQL stopped."; \
+	else \
+		echo "PostgreSQL is not running or status check failed."; \
+	fi
+
+
+
+# ------ Not needed anymore (use honcho + Procfile.dev for ideal logging overview) -----
 up:
 	@echo "Starting backend: PostgreSQL + Redis + Celery"
 	@make start_db
@@ -23,38 +50,6 @@ down:
 	@make stop_celery
 	@make stop_redis
 	@make stop_db
-
-init_db:
-	@echo "(Re-)Initializing database schema..."
-	@$(PYTHON) utils/init_db.py
-
-clear_db:
-	@echo "Deleting all data (preserving schema)"
-	@$(PYTHON) utils/clear_db.py
-
-start_redis:
-	@echo "Starting Redis server in detached mode"
-	@redis-server --save "" --appendonly no --daemonize yes 
-
-stop_redis:
-	@echo "Stopping Redis server"
-	@if redis-cli ping > /dev/null 2>&1; then \
-		redis-cli shutdown; \
-	else \
-		echo "Redis is not running."; \
-	fi
-
-start_db:
-	@echo "Starting PostgreSQL"
-	@pg_ctl -D $(DB_DIR) -l $(DB_LOG_FILE) start
-
-stop_db:
-	@echo "Stopping PostgreSQL server"
-	@if pg_ctl -D $(DB_DIR) status > /dev/null 2>&1; then \
-		pg_ctl -D $(DB_DIR) stop -m fast && echo "PostgreSQL stopped."; \
-	else \
-		echo "PostgreSQL is not running or status check failed."; \
-	fi
 
 start_celery:
 	@echo "Starting Celery worker in background"
@@ -85,5 +80,18 @@ stop_fastapi:
 	else \
 		echo "No FastAPI PID file found."; \
 	fi
+
+start_redis:
+	@echo "Starting Redis server in detached mode"
+	@redis-server --save "" --appendonly no --daemonize yes 
+
+stop_redis:
+	@echo "Stopping Redis server"
+	@if redis-cli ping > /dev/null 2>&1; then \
+		redis-cli shutdown; \
+	else \
+		echo "Redis is not running."; \
+	fi
+
 
 .PHONY: start_backend stop_backend init_db clear_db start_redis stop_redis start_db stop_db start_celery stop_celery
