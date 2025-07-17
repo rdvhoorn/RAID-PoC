@@ -3,7 +3,7 @@ from api.schemas import RunJobRequest, JobStatusResponse, FinalizeJobRequest
 from api.middleware_logging import RequestIDMiddleware
 from db.session import SessionLocal
 from db.models import Job, JobStatusEnum, FileStatusEnum
-from tasks.slurm_tasks import run_slurm_inference
+from tasks.slurm_tasks import dispatch_fake_slurm_inference
 from utils.logging_config import get_and_configure_logger
 from pathlib import Path
 
@@ -29,7 +29,7 @@ def run_job(req: RunJobRequest, request: Request):
             session.commit()
             
             # Trigger SLURM task via Celery
-            run_slurm_inference.delay(req.wsi_id, req.tool_name)
+            dispatch_fake_slurm_inference.delay(req.wsi_id, req.tool_name)
             
             log.info("job_created_and_submitted", job_id=job.job_id)
             return {"message": f"Created and submitted job with ID {job.job_id}"}

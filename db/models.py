@@ -14,7 +14,7 @@ class JobStatusEnum(str, Enum):
     FAILED = "FAILED"
     
 class FileStatusEnum(str, Enum):
-    PENDING = "RUNNING"
+    RUNNING = "RUNNING"
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
 
