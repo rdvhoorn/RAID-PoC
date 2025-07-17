@@ -1,4 +1,5 @@
-from utils.simulate_api_call.submit_job import submit_job
+from utils.simulate_api_calls.submit_job import submit_job
+from utils.config import config
 
 def test_submit_job_success(mocker):
     # Arrange: define a fake successful response, like the API would respond
@@ -9,7 +10,7 @@ def test_submit_job_success(mocker):
 
     # Patch the actual HTTP call
     # Intuition: if `utils.tasks.submit_job.requests.post` is called, return mock_response (instead of actually calling the function)
-    mock_post = mocker.patch("utils.tasks.submit_job.requests.post", return_value=mock_response)
+    mock_post = mocker.patch("utils.simulate_api_calls.submit_job.requests.post", return_value=mock_response)
 
     # Act: call the function we want to test
     result = submit_job("WSI_001", "cellvit")
@@ -17,7 +18,7 @@ def test_submit_job_success(mocker):
     # Assert: verify behavior
     # With the mocker, we can assert how often the function was called, and with which parameters
     mock_post.assert_called_once_with(
-        "http://localhost:8000/run_job",
+        f"{config["FASTAPI_HOST"]}:{config["FASTAPI_PORT"]}/run_job",
         json={"wsi_id": "WSI_001", "tool_name": "cellvit"}
     )
     # With the result of the function, we can assert the output is correct
