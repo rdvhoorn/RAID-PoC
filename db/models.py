@@ -11,6 +11,11 @@ class JobStatusEnum(str, Enum):
     RUNNING = "RUNNING"
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
+    
+class FileStatusEnum(str, Enum):
+    PENDING = "RUNNING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
 
 class Job(Base):
     __tablename__ = "jobs"
@@ -32,6 +37,7 @@ class ResultFile(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     job_id = Column(Integer, ForeignKey("jobs.job_id"))
+    status = Column(SqlEnum(FileStatusEnum, native_enum=False), default=FileStatusEnum.RUNNING)
     file_path = Column(String)
     file_type = Column(String)
     description = Column(String)
