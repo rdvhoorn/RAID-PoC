@@ -1,7 +1,7 @@
 import requests
 from utils.config import config
 
-API_URL = f"http://localhost:{config["FASTAPI_PORT"]}/run_job"
+API_URL = f"{config["FASTAPI_HOST"]}:{config["FASTAPI_PORT"]}/run_job"
 
 def submit_job(wsi_id: str, tool_name: str):
     payload = {"wsi_id": wsi_id, "tool_name": tool_name}

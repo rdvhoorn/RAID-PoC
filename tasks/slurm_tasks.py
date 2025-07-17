@@ -36,7 +36,7 @@ def dispatch_fake_slurm_inference(wsi_id: str, tool_name: str):
 
         # Submit SLURM job using sbatch
         result = subprocess.run(
-            ["sbatch", "scripts/run_inference.sh", wsi_id, config["INFERENCE_OUTPUT_DIR"]],
+            ["sbatch", "scripts/run_inference.sh", config["INFERENCE_OUTPUT_DIR"], job.job_id],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,

@@ -4,22 +4,19 @@
 #SBATCH --time=00:01:00
 #SBATCH --mem=512M
 
-WSI_ID=$1
-OUTPUT_DIR=$2
+OUTPUT_DIR=$1
+JOB_ID=$2
 
-echo "Starting fake AI inference on WSI: $WSI_ID"
+echo "Starting fake AI for job $JOB_ID"
 sleep 10
 
 mkdir -p "$OUTPUT_DIR"
 
 # Move stdout to the output folder manually
-mv "$SLURM_JOB_NAME-$SLURM_JOB_ID.out" "$OUTPUT_DIR/slurm_$WSI_ID.out"
+mv "$SLURM_JOB_NAME-$SLURM_JOB_ID.out" "$OUTPUT_DIR/slurm_$JOB_ID.out"
 
 # Write result JSON to output directory
-echo "{\"wsi_id\": \"$WSI_ID\", \"status\": \"COMPLETED\"}" > "$OUTPUT_DIR/$WSI_ID.json"
+echo "{\"job_id\": \"$JOB_ID\", \"status\": \"COMPLETED\"}" > "$OUTPUT_DIR/$JOB_ID.json"
 
-
-# This is a script that SLURM will execute to simulate a model run.
-# Accepts a WSI ID as argument
-# Sleeps for 5 seconds
-# Writes a fake JSON result to /tmp/raid_result_<wsi_id>.json
+# Notify server of completion
+python3 scripts/notify_finalize_job.py "$JOB_ID"

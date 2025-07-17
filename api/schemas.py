@@ -8,3 +8,6 @@ class JobStatusResponse(BaseModel):
     wsi_id: str
     tool_name: str
     status: str
+    
+class FinalizeJobRequest(BaseModel):
+    job_id: int
