@@ -36,7 +36,7 @@ def dispatch_fake_slurm_inference(wsi_id: str, tool_name: str):
 
         # Submit SLURM job using sbatch
         result = subprocess.run(
-            ["sbatch", "scripts/run_inference.sh", config["INFERENCE_OUTPUT_DIR"], job.job_id],
+            ["sbatch", "scripts/run_inference.sh", config["INFERENCE_OUTPUT_DIR"], str(job.job_id)],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
@@ -57,8 +57,8 @@ def dispatch_fake_slurm_inference(wsi_id: str, tool_name: str):
 
         # Define output paths for this inference job
         output_dir = Path(config["INFERENCE_OUTPUT_DIR"])
-        json_path = output_dir / f"{wsi_id}.json"
-        slurm_path = output_dir / f"slurm_{wsi_id}.out"
+        json_path = output_dir / f"{job.job_id}.json"
+        slurm_path = output_dir / f"slurm_{job.job_id}.out"
         
         # Add resultfiles to database
         for file_path, file_type in [(json_path, "json"), (slurm_path, "out")]:

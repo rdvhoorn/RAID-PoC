@@ -1,3 +1,3 @@
 redis: PYTHONPATH=. redis-server --save "" --appendonly no
-fastapi: SERVICE_NAME=$FASTAPI_SERVICE_NAME PYTHONPATH=. uvicorn api.main:app --port $FASTAPI_PORT --reload --reload-dir api
+fastapi: SERVICE_NAME=$FASTAPI_SERVICE_NAME PYTHONPATH=. uvicorn api.main:app --host 0.0.0.0 --port $FASTAPI_PORT --reload --reload-dir api
 celery: SERVICE_NAME=$CELERY_SERVICE_NAME PYTHONPATH=. celery -A $CELERY_APP worker --loglevel=info --concurrency=1 --pool=solo

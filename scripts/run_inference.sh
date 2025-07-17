@@ -8,7 +8,7 @@ OUTPUT_DIR=$1
 JOB_ID=$2
 
 echo "Starting fake AI for job $JOB_ID"
-sleep 10
+sleep 5
 
 mkdir -p "$OUTPUT_DIR"
 
